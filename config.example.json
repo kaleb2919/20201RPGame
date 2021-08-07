@@ -1,0 +1,11 @@
+{
+    "token" : "token",
+    "prefix" : "!",
+    "db" : {
+        "port": "port",
+        "user": "user",
+        "host": "host",
+        "database": "database",
+        "password": "password"
+    }
+}
