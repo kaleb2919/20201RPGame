@@ -1,21 +1,25 @@
-const utils = require('../utils.js');
-const config = require('../config.json');
+const utils = require.main.require('./utils.js');
 
 module.exports = {
-	name: 'messageCreate',
-	once: false,
-	async execute(message, client) {
-		if (!client.application?.owner)
+    name: 'messageCreate',
+    once: false,
+    async execute(client, cache, message) {
+        if (!client.application?.owner)
             await client.application?.fetch();
-        
+
         if (!utils.userEqual(message.author, client.user)) {
-            console.log(`Входящее сообщение: ${message.content}`);
-            var [command, args] = utils.parseMassage(message.content.toLowerCase(), config.prefix);
-            
+            var [command, args] = utils.parseMassage(message.content.toLowerCase(), client.prefix);
             if (command == 'deploy') {
-                await client.guilds.cache.get(message.guild.id)?.commands.set(client.commands);
-                await client.application?.commands.set(client.commands);
+                var oa2guilds = await client.guilds.fetch();
+
+                await oa2guilds.each(async (oa2guild) => {
+                    var guild = client.guilds.cache.get(oa2guild.id);
+                    guild.commands.set([]);
+                    guild.commands.set(Array.from(client.commands, ([name, command]) => (command)));
+                });
+
+                return message.reply({ content: `Deploy completed!\n>>> ${client.commands.map((e) => e.name)}`, ephemeral: true });
             }
         }
-	}
+    }
 };
